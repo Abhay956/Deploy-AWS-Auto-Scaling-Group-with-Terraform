@@ -1,9 +1,9 @@
 resource "aws_launch_template" "asg_ec2_template" {
-  name                        = "template1"
-  image_id                    = "ami-04b70fa74e45c3917"
-  instance_type               = "t2.micro"
-  vpc_security_group_ids      = [aws_security_group.sg1.id]
-  user_data                   = base64encode(file("user-data.sh"))
+  name                   = "template1"
+  image_id               = "ami-04b70fa74e45c3917"
+  instance_type          = "t2.micro"
+  vpc_security_group_ids = [aws_security_group.sg1.id]
+  user_data              = base64encode(file("user-data.sh"))
   tags = {
     Name = "Auto_scaling-instance"
   }
@@ -29,51 +29,51 @@ resource "aws_autoscaling_group" "ag" {
 resource "aws_autoscaling_policy" "asg_policy_up" {
   name                   = "asg_policy_up"
   scaling_adjustment     = 3
-  adjustment_type = "ChangeInCapacity"
+  adjustment_type        = "ChangeInCapacity"
   cooldown               = 300
   autoscaling_group_name = aws_autoscaling_group.ag.name
 }
 
 resource "aws_cloudwatch_metric_alarm" "asg_cpu_alaram_up" {
-    alarm_name          = "asg_cpu_alarm_up"
-    comparison_operator = "GreaterThanOrEqualToThreshold"
-    evaluation_periods  = "2"
-    metric_name         =  "CPUUtilization"
-    namespace = "AWS/EC2"
-    period = "60"
-    statistic = "Average"
-    threshold = "70"
+  alarm_name          = "asg_cpu_alarm_up"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "80"
 
-    dimensions = {
-      autoscaling_group_name = "${aws_autoscaling_group.ag.name}"
-    }
-    alarm_description = "This metrics monitors e2 cpu utilization"
-    alarm_actions = [aws_autoscaling_policy.asg_policy_up.arn]
+  dimensions = {
+    autoscaling_group_name = "${aws_autoscaling_group.ag.name}"
+  }
+  alarm_description = "This metrics monitors e2 cpu utilization"
+  alarm_actions     = [aws_autoscaling_policy.asg_policy_up.arn]
 }
 
 resource "aws_autoscaling_policy" "asg_policy_down" {
   name                   = "asg_policy_down"
   scaling_adjustment     = 1
-  adjustment_type = "ChangeInCapacity"
+  adjustment_type        = "ChangeInCapacity"
   cooldown               = 300
   autoscaling_group_name = aws_autoscaling_group.ag.name
 }
 
 resource "aws_cloudwatch_metric_alarm" "asg_cpu_alaram_down" {
-    alarm_name          = "asg_cpu_alarm_down"
-    comparison_operator = "GreaterThanOrEqualToThreshold"
-    evaluation_periods  = "2"
-    metric_name         =  "CPUUtilization"
-    namespace = "AWS/EC2"
-    period = "60"
-    statistic = "Average"
-    threshold = "70"
+  alarm_name          = "asg_cpu_alarm_down"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "30"
 
-    dimensions = {
-      autoscaling_group_name = "${aws_autoscaling_group.ag.name}"
-    }
-    alarm_description = "This metrics monitors e2 cpu utilization"
-    alarm_actions = [aws_autoscaling_policy.asg_policy_down.arn]
+  dimensions = {
+    autoscaling_group_name = "${aws_autoscaling_group.ag.name}"
+  }
+  alarm_description = "This metrics monitors e2 cpu utilization"
+  alarm_actions     = [aws_autoscaling_policy.asg_policy_down.arn]
 }
 
 ## vpc creation
